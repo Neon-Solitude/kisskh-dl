@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "PowerShell($dest = \"$HOME\\\\.claude\\\\skills\\\\code-documentation-doc-generate\"; if \\(Test-Path \"$HOME\\\\.claude\\\\skills\"\\) { \"skills dir exists\" } else { \"no skills dir\" }; Test-Path $dest; Get-ChildItem \"$HOME\\\\.claude\\\\skills\" -Directory -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name)",
+      "PowerShell($src = \"$HOME\\\\.claude\\\\antigravity-skills\\\\code-documentation-doc-generate\"; $dest = \"$HOME\\\\.claude\\\\skills\\\\code-documentation-doc-generate\"; Copy-Item -Path $src -Destination $dest -Recurse -Force; Get-ChildItem $dest -Recurse | Select-Object -ExpandProperty FullName)",
+      "PowerShell(git -C \"c:\\\\Users\\\\onika\\\\Programming\\\\GitHub\\\\kisskh-dl-main\" status --short)"
     ],
     "additionalDirectories": [
       "C:\\Users\\onika\\Downloads"
