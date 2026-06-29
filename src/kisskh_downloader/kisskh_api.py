@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import sys
+import time
 from urllib.parse import quote, urljoin
 
 import requests
@@ -23,7 +24,12 @@ class KissKHApi:
         KISSKH_SUB_KEY        - Pre-generated kkey for the subtitle endpoint
     """
 
-    def __init__(self, base_url: str | None = None):
+    def __init__(
+        self,
+        base_url: str | None = None,
+        headed: bool = False,
+        cdp_url: str | None = None,
+    ):
         if base_url is not None:
             resolved = base_url.rstrip("/")
         else:
@@ -32,6 +38,8 @@ class KissKHApi:
         self.site_domain = resolved
         self.session: requests.Session | None = None
         self._kkey_provider = None
+        self._headed = headed
+        self._cdp_url = cdp_url
 
     @property
     def kkey_provider(self):
@@ -39,7 +47,10 @@ class KissKHApi:
         if self._kkey_provider is None:
             from kisskh_downloader.kkey_utils import KkeyProvider
 
-            self._kkey_provider = KkeyProvider()
+            self._kkey_provider = KkeyProvider(
+                headless=not self._headed,
+                cdp_url=self._cdp_url,
+            )
         return self._kkey_provider
 
     def _drama_api_url(self, drama_id: int) -> str:
@@ -75,6 +86,7 @@ class KissKHApi:
             "Referer": referer or f"{self.site_domain}/",
         }
         response = session.get(url, headers=headers, timeout=30)
+        time.sleep(0.5)  # avoid 429 rate-limiting when looping over many episodes
         response.raise_for_status()
         logger.debug("Response %s: %s", response.status_code, url)
         return response
