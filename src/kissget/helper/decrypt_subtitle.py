@@ -3,7 +3,7 @@ from pathlib import Path
 import pysrt
 from pysrt import SubRipFile
 
-from kisskh_downloader.helper.aes_cipher import AESCipher
+from kissget.helper.aes_cipher import AESCipher
 
 
 class SubtitleDecrypter:

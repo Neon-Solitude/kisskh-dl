@@ -1,6 +1,6 @@
 import pytest
 
-from kisskh_downloader.models.drama import Drama
+from kissget.models.drama import Drama
 
 
 @pytest.fixture

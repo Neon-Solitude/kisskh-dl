@@ -25,7 +25,7 @@ import json
 import logging
 from pathlib import Path
 
-from kisskh_downloader.models.sub import SubItem
+from kissget.models.sub import SubItem
 
 logger = logging.getLogger(__name__)
 

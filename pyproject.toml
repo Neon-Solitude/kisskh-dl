@@ -1,9 +1,9 @@
 [project]
-name = "kisskh-downloader"
-version = "0.2.3"
-description = "Simple downloaded for https://kisskh.co/"
+name = "kissget"
+version = "0.1.0"
+description = "CLI downloader for kisskh.nl with manifest-based kkey-free downloads"
 readme = "README.md"
-authors = [{ name = "Debakar Roy", email = "allinonedibakar@gmail.com" }]
+authors = [{ name = "Neon-Solitude" }]
 requires-python = ">=3.10"
 dependencies = [
     "click>=8.3.3",
@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.scripts]
-kisskh = "kisskh_downloader.cli:kisskh"
+kissget = "kissget.cli:kissget"
 
 [dependency-groups]
 dev = [

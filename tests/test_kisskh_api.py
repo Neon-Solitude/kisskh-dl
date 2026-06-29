@@ -2,9 +2,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from kisskh_downloader.kisskh_api import KissKHApi
-from kisskh_downloader.models.search import DramaInfo, Search
-from kisskh_downloader.models.sub import SubItem
+from kissget.kisskh_api import KissKHApi
+from kissget.models.search import DramaInfo, Search
+from kissget.models.sub import SubItem
 
 
 @pytest.fixture(scope="module")

@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 
 import requests
 
-from kisskh_downloader.helper.decrypt_subtitle import SubtitleDecrypter
-from kisskh_downloader.models.sub import SubItem
+from kissget.helper.decrypt_subtitle import SubtitleDecrypter
+from kissget.models.sub import SubItem
 
 logger = logging.getLogger(__name__)
 

@@ -10,11 +10,11 @@ import click
 import validators
 from dotenv import load_dotenv
 
-from kisskh_downloader.downloader import Downloader
-from kisskh_downloader.enums.quality import Quality
-from kisskh_downloader.helper.decrypt_subtitle import SubtitleDecrypter
-from kisskh_downloader.kisskh_api import KissKHApi
-from kisskh_downloader.manifest import ManifestReader
+from kissget.downloader import Downloader
+from kissget.enums.quality import Quality
+from kissget.helper.decrypt_subtitle import SubtitleDecrypter
+from kissget.kisskh_api import KissKHApi
+from kissget.manifest import ManifestReader
 
 load_dotenv()
 
@@ -50,7 +50,7 @@ def _format_episode(num: float) -> str:
 
 @click.group()
 @click.option("-v", "--verbose", count=True, help="Increase log level verbosity")
-def kisskh(verbose):
+def kissget(verbose):
     logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
     if verbose == 1:
         logging.getLogger().setLevel(logging.INFO)
@@ -61,7 +61,7 @@ def kisskh(verbose):
 # ── Download command ─────────────────────────────────────────────────────
 
 
-@kisskh.command()
+@kissget.command()
 @click.argument("drama_url_or_name", default=None, required=False)
 @click.option("--first", "-f", type=click.INT, default=1, help="Starting episode number.")
 @click.option("--last", "-l", type=click.INT, default=sys.maxsize, help="Ending episode number.")
@@ -183,8 +183,8 @@ def dl(
         raise click.UsageError(
             "Provide a drama URL/name, or use --from-manifest to download from a manifest file.\n\n"
             "Examples:\n"
-            "  kisskh dl \"https://kisskh.nl/Drama/Some-Show?id=1234\"\n"
-            "  kisskh dl --from-manifest manifest.json -o ~/Downloads"
+            "  kissget dl \"https://kisskh.nl/Drama/Some-Show?id=1234\"\n"
+            "  kissget dl --from-manifest manifest.json -o ~/Downloads"
         )
 
     # Resolve secrets from env vars if not passed via CLI
@@ -404,7 +404,7 @@ def dl(
 # ── Collect command ──────────────────────────────────────────────────────
 
 
-@kisskh.command()
+@kissget.command()
 @click.argument("drama_url_or_name")
 @click.option("--first", "-f", type=click.INT, default=1, help="Starting episode number.")
 @click.option("--last", "-l", type=click.INT, default=sys.maxsize, help="Ending episode number.")
@@ -613,7 +613,7 @@ def collect(
 # ── Get-key command ──────────────────────────────────────────────────────
 
 
-@kisskh.command(name="get-key")
+@kissget.command(name="get-key")
 @click.argument("drama_url")
 def get_key(drama_url: str) -> None:
     """Generate and display kkey tokens for a drama episode URL.
@@ -715,7 +715,7 @@ def _find_browser() -> str | None:
     return None
 
 
-@kisskh.command(name="open-browser")
+@kissget.command(name="open-browser")
 @click.option("--port", default=9222, help="CDP debug port (default: 9222).")
 @click.option("--browser-path", default=None, help="Path to Chrome/Edge executable.")
 def open_browser(port: int, browser_path: str | None) -> None:
@@ -776,4 +776,4 @@ def open_browser(port: int, browser_path: str | None) -> None:
 
 
 if __name__ == "__main__":
-    kisskh()
+    kissget()

@@ -1,15 +1,9 @@
-# kisskh-dl
+# kissget
 
 <div align="center">
-   <img src="https://i.imgur.com/nhQtOZa.png">
-   <br>
-   <strong><i>Simple downloader for https://kisskh.nl/</i></strong>
-   <br>
-   <a href="https://pypi.org/project/kisskh-downloader/">
-   <img src="https://img.shields.io/pypi/v/kisskh-downloader?style=for-the-badge">
-   </a>
-   <img src="https://img.shields.io/github/actions/workflow/status/debakarr/kisskh-dl/pull-request.yml?style=for-the-badge">
-   <img src="https://img.shields.io/pypi/dm/kisskh-downloader?style=for-the-badge">
+   <strong><i>CLI downloader for https://kisskh.nl/ with kkey-free manifest workflow</i></strong>
+   <br><br>
+   <a href="https://github.com/Neon-Solitude/kisskh-dl">Fork of kisskh-dl by debakarr</a>
 </div>
 
 ---
@@ -21,7 +15,7 @@ Command-line tool for downloading dramas from [kisskh.nl](https://kisskh.nl/).
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Method A: Browser Collector Script (Recommended)](#method-a-browser-collector-script-recommended)
-- [Method B: `kisskh collect` CLI](#method-b-kisskh-collect-cli)
+- [Method B: `kissget collect` CLI](#method-b-kissget-collect-cli)
 - [Method C: Direct API Download](#method-c-direct-api-download)
 - [Command Reference](#command-reference)
 - [Authentication](#authentication)
@@ -34,7 +28,7 @@ Command-line tool for downloading dramas from [kisskh.nl](https://kisskh.nl/).
 ## Installation
 
 ```console
-pip install -U kisskh-downloader
+pip install -U kissget
 ```
 
 ---
@@ -51,7 +45,7 @@ kisskh.nl requires a short-lived `kkey` authentication token for its stream and 
 4. Save the JSON to a file and run:
 
 ```console
-kisskh dl --from-manifest manifest.json -s en -o "C:\Users\you\Videos"
+kissget dl --from-manifest manifest.json -s en -o "C:\Users\you\Videos"
 ```
 
 ---
@@ -83,7 +77,7 @@ Data is saved to `localStorage` so it survives accidental page refreshes.
 ### Running the download
 
 ```console
-kisskh dl --from-manifest manifest.json -s en -o "C:\Users\you\Videos\TV Shows"
+kissget dl --from-manifest manifest.json -s en -o "C:\Users\you\Videos\TV Shows"
 ```
 
 Add `-s all` to download every available subtitle language, or `-s en -s ko` for multiple specific languages.
@@ -91,13 +85,13 @@ Add `-s all` to download every available subtitle language, or `-s en -s ko` for
 To download subtitles only (no video):
 
 ```console
-kisskh dl --from-manifest manifest.json -s en --subs-only -o "C:\Users\you\Videos\TV Shows"
+kissget dl --from-manifest manifest.json -s en --subs-only -o "C:\Users\you\Videos\TV Shows"
 ```
 
 To download a subset of episodes from the manifest:
 
 ```console
-kisskh dl --from-manifest manifest.json -s en -f 5 -l 8 -o "C:\Users\you\Videos\TV Shows"
+kissget dl --from-manifest manifest.json -s en -f 5 -l 8 -o "C:\Users\you\Videos\TV Shows"
 ```
 
 ### Re-using the overlay
@@ -106,9 +100,9 @@ The hooks persist for the lifetime of the page. If you close the overlay, re-pas
 
 ---
 
-## Method B: `kisskh collect` CLI
+## Method B: `kissget collect` CLI
 
-`kisskh collect` automates the manifest-building step from the command line. It visits each episode page using a browser (Playwright or your own Chrome via CDP) to extract stream and subtitle URLs, then writes them to a manifest JSON file.
+`kissget collect` automates the manifest-building step from the command line. It visits each episode page using a browser (Playwright or your own Chrome via CDP) to extract stream and subtitle URLs, then writes them to a manifest JSON file.
 
 ### Prerequisites
 
@@ -121,7 +115,7 @@ playwright install chromium
 ### Basic usage
 
 ```console
-kisskh collect "https://kisskh.nl/Drama/Customized-Lover-(2026)?id=13191"
+kissget collect "https://kisskh.nl/Drama/Customized-Lover-(2026)?id=13191"
 ```
 
 This produces `Customized-Lover--2026-_manifest.json` in the current directory.
@@ -132,10 +126,10 @@ If Playwright's headless browser is detected and blocked, connect to your real b
 
 ```console
 # Step 1 — open Chrome with remote debugging
-kisskh open-browser
+kissget open-browser
 
 # Step 2 — collect using that browser session
-kisskh collect "https://kisskh.nl/Drama/Show-Name?id=1234" --cdp-url http://localhost:9222
+kissget collect "https://kisskh.nl/Drama/Show-Name?id=1234" --cdp-url http://localhost:9222
 ```
 
 The first time, log in or solve any CAPTCHA in the opened browser window. Cookies are saved to `~/.kisskh/browser_profile` for future runs.
@@ -157,7 +151,7 @@ The first time, log in or solve any CAPTCHA in the opened browser window. Cookie
 ### Then download
 
 ```console
-kisskh dl --from-manifest "Show-Name_manifest.json" -s en -o "C:\Users\you\Videos"
+kissget dl --from-manifest "Show-Name_manifest.json" -s en -o "C:\Users\you\Videos"
 ```
 
 ---
@@ -175,25 +169,25 @@ playwright install chromium
 ### Download entire series by URL
 
 ```console
-kisskh dl "https://kisskh.nl/Drama/Island-Season-2?id=7000" -o .
+kissget dl "https://kisskh.nl/Drama/Island-Season-2?id=7000" -o .
 ```
 
 ### Download by search query
 
 ```console
-kisskh dl "Stranger Things" -o .
+kissget dl "Stranger Things" -o .
 ```
 
 ### Download specific episode range
 
 ```console
-kisskh dl "https://kisskh.nl/Drama/Alchemy-of-Souls?id=5043" -f 4 -l 8 -q 720p -o .
+kissget dl "https://kisskh.nl/Drama/Alchemy-of-Souls?id=5043" -f 4 -l 8 -q 720p -o .
 ```
 
 ### Download a single episode
 
 ```console
-kisskh dl "https://kisskh.nl/Drama/A-Business-Proposal/Episode-3?id=4608&ep=86439&page=0&pageSize=100" -o .
+kissget dl "https://kisskh.nl/Drama/A-Business-Proposal/Episode-3?id=4608&ep=86439&page=0&pageSize=100" -o .
 ```
 
 ### Download subtitles first (recommended for large batches)
@@ -201,13 +195,13 @@ kisskh dl "https://kisskh.nl/Drama/A-Business-Proposal/Episode-3?id=4608&ep=8643
 When downloading many episodes, use `--subs-first` to download all subtitles in one pass (while the kkey is fresh), then download all videos:
 
 ```console
-kisskh dl "https://kisskh.nl/Drama/Show-Name?id=1234" --subs-first -s en -o .
+kissget dl "https://kisskh.nl/Drama/Show-Name?id=1234" --subs-first -s en -o .
 ```
 
 ### Skip recap/special episodes
 
 ```console
-kisskh dl "https://kisskh.nl/Drama/Show-Name?id=1234" --skip-recap -o .
+kissget dl "https://kisskh.nl/Drama/Show-Name?id=1234" --skip-recap -o .
 ```
 
 ### Headed mode (for CAPTCHA)
@@ -215,17 +209,17 @@ kisskh dl "https://kisskh.nl/Drama/Show-Name?id=1234" --skip-recap -o .
 If the site blocks the headless browser with a CAPTCHA, run in headed mode so you can solve it manually:
 
 ```console
-kisskh dl "https://kisskh.nl/Drama/Show-Name?id=1234" --headed -o .
+kissget dl "https://kisskh.nl/Drama/Show-Name?id=1234" --headed -o .
 ```
 
 ---
 
 ## Command Reference
 
-### `kisskh dl`
+### `kissget dl`
 
 ```
-Usage: kisskh dl [OPTIONS] [DRAMA_URL_OR_NAME]
+Usage: kissget dl [OPTIONS] [DRAMA_URL_OR_NAME]
 
   Download episodes from kisskh.
 
@@ -261,10 +255,10 @@ Options:
   --help                          Show this message and exit.
 ```
 
-### `kisskh collect`
+### `kissget collect`
 
 ```
-Usage: kisskh collect [OPTIONS] DRAMA_URL_OR_NAME
+Usage: kissget collect [OPTIONS] DRAMA_URL_OR_NAME
 
   Capture stream and subtitle URLs into a JSON manifest for kkey-free downloads.
 
@@ -283,12 +277,12 @@ Options:
   --help                          Show this message and exit.
 ```
 
-### `kisskh get-key`
+### `kissget get-key`
 
 Generates and displays `kkey` tokens for a drama episode URL. Opens a headless browser to extract the authentication keys.
 
 ```console
-kisskh get-key "https://kisskh.nl/Drama/A-Business-Proposal/Episode-1?id=4608&ep=86192&page=0&pageSize=100"
+kissget get-key "https://kisskh.nl/Drama/A-Business-Proposal/Episode-1?id=4608&ep=86192&page=0&pageSize=100"
 ```
 
 Output:
@@ -303,12 +297,12 @@ Output:
     set KISSKH_SUB_KEY=<long_hex_string>
 ```
 
-### `kisskh open-browser`
+### `kissget open-browser`
 
-Launches Chrome or Edge with CDP remote debugging enabled. Use this before `kisskh collect --cdp-url` to bypass bot detection.
+Launches Chrome or Edge with CDP remote debugging enabled. Use this before `kissget collect --cdp-url` to bypass bot detection.
 
 ```console
-kisskh open-browser [--port 9222] [--browser-path PATH]
+kissget open-browser [--port 9222] [--browser-path PATH]
 ```
 
 The browser opens a persistent profile at `~/.kisskh/browser_profile` — cookies and login sessions are preserved between runs.
@@ -322,9 +316,9 @@ kisskh.nl requires a short-lived `kkey` token for stream and subtitle API calls.
 | Method | When to use |
 |---|---|
 | **Browser collector script** (`tools/browser_collector.js`) | Best: captures CDN URLs directly from your browser; no kkeys needed at all |
-| **`kisskh collect` with CDP** (`--cdp-url`) | Good: uses your real browser session via `kisskh open-browser` |
-| **`kisskh collect` with Playwright** | Automated: requires `playwright install chromium`; may be blocked by bot detection |
-| **`kisskh get-key` + env vars** | Manual: generate keys once and export them; they expire within seconds |
+| **`kissget collect` with CDP** (`--cdp-url`) | Good: uses your real browser session via `kissget open-browser` |
+| **`kissget collect` with Playwright** | Automated: requires `playwright install chromium`; may be blocked by bot detection |
+| **`kissget get-key` + env vars** | Manual: generate keys once and export them; they expire within seconds |
 | **Playwright per-episode** | Fallback: kkeys generated automatically per episode via headless browser |
 
 ### Environment variables for authentication
@@ -340,21 +334,21 @@ Set both to skip browser-based kkey generation entirely:
 ```cmd
 set KISSKH_STREAM_KEY=your_stream_key_here
 set KISSKH_SUB_KEY=your_sub_key_here
-kisskh dl "https://kisskh.nl/Drama/Show-Name?id=1234" -o .
+kissget dl "https://kisskh.nl/Drama/Show-Name?id=1234" -o .
 ```
 
 **Linux / macOS:**
 ```bash
 export KISSKH_STREAM_KEY=your_stream_key_here
 export KISSKH_SUB_KEY=your_sub_key_here
-kisskh dl "https://kisskh.nl/Drama/Show-Name?id=1234" -o .
+kissget dl "https://kisskh.nl/Drama/Show-Name?id=1234" -o .
 ```
 
 ---
 
 ## N_m3u8DL-RE (Faster Downloads)
 
-[N_m3u8DL-RE](https://github.com/nilaoda/N_m3u8DL-RE) is a multi-threaded HLS downloader. When available, `kisskh dl` uses it automatically instead of yt-dlp, resulting in significantly faster downloads.
+[N_m3u8DL-RE](https://github.com/nilaoda/N_m3u8DL-RE) is a multi-threaded HLS downloader. When available, `kissget dl` uses it automatically instead of yt-dlp, resulting in significantly faster downloads.
 
 ### Setup
 
@@ -366,7 +360,7 @@ Download `N_m3u8DL-RE.exe` and place it in one of these locations (auto-detected
 Or specify the path explicitly:
 
 ```console
-kisskh dl --from-manifest manifest.json --n-m3u8dl-re "C:\tools\N_m3u8DL-RE.exe" -o .
+kissget dl --from-manifest manifest.json --n-m3u8dl-re "C:\tools\N_m3u8DL-RE.exe" -o .
 ```
 
 If ffmpeg is in the same directory as N_m3u8DL-RE, it is detected automatically and used to mux the output to MP4.
@@ -378,7 +372,7 @@ If ffmpeg is in the same directory as N_m3u8DL-RE, it is detected automatically 
 Some subtitle files are encrypted. Pass the decryption key and IV with `--decrypt-subtitle`:
 
 ```console
-kisskh dl "DRAMA_URL" --decrypt-subtitle --key "your_key" --initialization-vector "your_iv" -o .
+kissget dl "DRAMA_URL" --decrypt-subtitle --key "your_key" --initialization-vector "your_iv" -o .
 ```
 
 Or set them as environment variables:
@@ -398,7 +392,7 @@ export KISSKH_INITIALIZATION_VECTOR=your_iv_here
 Then use `--decrypt-subtitle` without the explicit flags:
 
 ```console
-kisskh dl "DRAMA_URL" --decrypt-subtitle -o .
+kissget dl "DRAMA_URL" --decrypt-subtitle -o .
 ```
 
 ---
@@ -415,11 +409,11 @@ Some CDN hosts serve HTTP traffic on port 443. The tool handles this automatical
 
 ### kkey tokens expire too fast
 
-kkeys are session-based and expire in seconds. Use the [browser collector script](#method-a-browser-collector-script-recommended) or `kisskh collect` to build a manifest of CDN URLs that don't require kkeys.
+kkeys are session-based and expire in seconds. Use the [browser collector script](#method-a-browser-collector-script-recommended) or `kissget collect` to build a manifest of CDN URLs that don't require kkeys.
 
 ### Playwright is blocked by Cloudflare
 
-Run with `--headed` to open the browser visibly so you can solve the CAPTCHA, or use `kisskh open-browser` + `--cdp-url` to connect to your own Chrome session.
+Run with `--headed` to open the browser visibly so you can solve the CAPTCHA, or use `kissget open-browser` + `--cdp-url` to connect to your own Chrome session.
 
 ### Quality fallback
 
@@ -444,9 +438,9 @@ If the selected quality is not available, the tool downloads the next lower avai
 Use `-v` for verbose output or `-vv` for full debug logging:
 
 ```console
-kisskh -vv dl --from-manifest manifest.json -s en -o .
+kissget -vv dl --from-manifest manifest.json -s en -o .
 ```
 
 ```console
-kisskh -vv dl "https://kisskh.nl/Drama/A-Business-Proposal?id=4608" -f 3 -l 3 -q 720p
+kissget -vv dl "https://kisskh.nl/Drama/A-Business-Proposal?id=4608" -f 3 -l 3 -q 720p
 ```

@@ -8,9 +8,9 @@ from urllib.parse import quote, urljoin
 
 import requests
 
-from kisskh_downloader.models.drama import Drama
-from kisskh_downloader.models.search import DramaInfo, Search
-from kisskh_downloader.models.sub import Sub, SubItem
+from kissget.models.drama import Drama
+from kissget.models.search import DramaInfo, Search
+from kissget.models.sub import Sub, SubItem
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ class KissKHApi:
     def kkey_provider(self):
         """Lazy-load KkeyProvider only when needed."""
         if self._kkey_provider is None:
-            from kisskh_downloader.kkey_utils import KkeyProvider
+            from kissget.kkey_utils import KkeyProvider
 
             self._kkey_provider = KkeyProvider(
                 headless=not self._headed,

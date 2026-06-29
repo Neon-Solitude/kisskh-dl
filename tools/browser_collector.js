@@ -14,13 +14,13 @@
  *      (you don't need to press Play; the API calls fire when the episode loads)
  *   6. When done, click "Copy Manifest" in the overlay
  *   7. Save the copied JSON to a .json file
- *   8. Run: kisskh dl --from-manifest manifest.json -o "C:\Users\onika\Downloads"
+ *   8. Run: kissget dl --from-manifest manifest.json -o "C:\Users\onika\Downloads"
  *
  * Data is stored in localStorage, so it survives accidental page refreshes.
  * Click "Clear" in the overlay to start over for a different show.
  */
 (function () {
-  const STORAGE_KEY = "kisskh_collector";
+  const STORAGE_KEY = "kissget_collector";
 
   // ── Helpers ─────────────────────────────────────────────────────────────
 
@@ -63,7 +63,7 @@
       data.episodes[epNum].stream_url = url;
       saveData(data);
       console.log(
-        `%c[kisskh-collector] ✅ E${epNum} stream captured`,
+        `%c[kissget-collector] ✅ E${epNum} stream captured`,
         "color:lime;font-weight:bold",
         url.substring(0, 100) + (url.length > 100 ? "..." : "")
       );
@@ -93,7 +93,7 @@
     saveData(data);
 
     console.log(
-      `%c[kisskh-collector] ✅ E${epNum} ${subs.length} sub(s) captured`,
+      `%c[kissget-collector] ✅ E${epNum} ${subs.length} sub(s) captured`,
       "color:lime;font-weight:bold",
       subs.map((s) => s.lang).join(", ")
     );
@@ -121,11 +121,11 @@
       });
       po.observe({ type: "resource", buffered: true });
       console.log(
-        "%c[kisskh-collector] PerformanceObserver installed — already-loaded URLs captured too.",
+        "%c[kissget-collector] PerformanceObserver installed — already-loaded URLs captured too.",
         "color:lime;font-weight:bold"
       );
     } catch (e) {
-      console.warn("[kisskh-collector] PerformanceObserver unavailable:", e);
+      console.warn("[kissget-collector] PerformanceObserver unavailable:", e);
     }
   }
 
@@ -158,7 +158,7 @@
       return response;
     };
 
-    console.log("%c[kisskh-collector] fetch hook installed.", "color:lime;font-weight:bold");
+    console.log("%c[kissget-collector] fetch hook installed.", "color:lime;font-weight:bold");
   }
 
   // ── XHR hook: same as above but for Angular's HttpClient (uses XHR) ─────
@@ -191,7 +191,7 @@
       return _send.apply(this, args);
     };
 
-    console.log("%c[kisskh-collector] XHR hook installed.", "color:lime;font-weight:bold");
+    console.log("%c[kissget-collector] XHR hook installed.", "color:lime;font-weight:bold");
   }
 
   // ── Overlay UI ──────────────────────────────────────────────────────────
@@ -263,13 +263,13 @@
         this.textContent = "✅ Copied!";
         setTimeout(() => { this.textContent = "📋 Copy Manifest"; }, 2500);
         console.log(
-          "%c[kisskh-collector] Manifest copied to clipboard.",
+          "%c[kissget-collector] Manifest copied to clipboard.",
           "color:lime;font-weight:bold"
         );
         console.log(json);
       }).catch(() => {
         console.log(
-          "%c[kisskh-collector] Clipboard blocked. Manifest logged below:",
+          "%c[kissget-collector] Clipboard blocked. Manifest logged below:",
           "color:orange;font-weight:bold"
         );
         console.log(json);
@@ -281,14 +281,14 @@
       if (confirm("Clear all collected episode data?")) {
         saveData({ drama: "", episodes: {} });
         renderOverlay();
-        console.log("%c[kisskh-collector] Data cleared.", "color:orange");
+        console.log("%c[kissget-collector] Data cleared.", "color:orange");
       }
     };
 
     document.getElementById("__kisskh_close").onclick = function () {
       overlay.remove();
       console.log(
-        "%c[kisskh-collector] Overlay hidden — collector still active. " +
+        "%c[kissget-collector] Overlay hidden — collector still active. " +
         "Re-run the script to show overlay again.",
         "color:yellow"
       );
