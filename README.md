@@ -10,7 +10,7 @@
    <br>
    ![kkey-free](https://img.shields.io/badge/kkeys-NOT%20REQUIRED-brightgreen?style=for-the-badge)
    ![Workflow](https://img.shields.io/badge/workflow-manifest--based-8B5CF6?style=for-the-badge)
-   ![Downloader](https://img.shields.io/badge/downloader-N__m3u8DL--RE-F97316?style=for-the-badge)
+   [![Downloader](https://img.shields.io/badge/downloader-N__m3u8DL--RE-F97316?style=for-the-badge)](https://github.com/nilaoda/N_m3u8DL-RE)
    <br>
    ![Fork](https://img.shields.io/badge/fork_of-debakarr%2Fkisskh--dl-6B7280?style=for-the-badge&logo=github&logoColor=white)
    ![Stars](https://img.shields.io/github/stars/Neon-Solitude/kisskh-dl?style=for-the-badge&logo=github&color=EAB308)
@@ -357,16 +357,16 @@ kissget dl "https://kisskh.nl/Drama/Show-Name?id=1234" -o .
 
 ---
 
-## N_m3u8DL-RE (Faster Downloads)
+## [N_m3u8DL-RE](https://github.com/nilaoda/N_m3u8DL-RE) (Faster Downloads)
 
-[N_m3u8DL-RE](https://github.com/nilaoda/N_m3u8DL-RE) is a multi-threaded HLS downloader. When available, `kissget dl` uses it automatically instead of yt-dlp, resulting in significantly faster downloads.
+N_m3u8DL-RE is a multi-threaded HLS downloader by [nilaoda](https://github.com/nilaoda). When available, `kissget dl` uses it automatically instead of yt-dlp, resulting in significantly faster downloads.
 
 ### Setup
 
-Download `N_m3u8DL-RE.exe` and place it in one of these locations (auto-detected):
+Download the latest release from the [N_m3u8DL-RE releases page](https://github.com/nilaoda/N_m3u8DL-RE/releases) and place the executable in one of these locations (auto-detected):
 
 - Anywhere on your system `PATH`
-- `~/Programming/GitHub/N_m3u8DL_RE_GUI-main/N_m3u8DL-RE.exe`
+- `~/N_m3u8DL-RE/N_m3u8DL-RE.exe` (or any convenient directory)
 
 Or specify the path explicitly:
 
