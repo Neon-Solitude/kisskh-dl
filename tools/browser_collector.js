@@ -43,15 +43,18 @@
 
   function currentDramaSlug() {
     const m = window.location.pathname.match(/\/Drama\/([^\/]+)/i);
-    return m ? m[1] : "";
+    if (!m) return "";
+    // Collapse consecutive dashes and strip trailing punctuation that
+    // kisskh adds when drama titles contain parentheses (e.g. "Deep-In--2026-")
+    return m[1].replace(/--+/g, "-").replace(/[-_]+$/, "");
   }
 
   // ── Capture functions ────────────────────────────────────────────────────
 
   function captureStream(url) {
-    // Try to extract episode number from the CDN URL path first (e.g. -Ep3/)
-    // then fall back to the current page URL.
-    const epMatch = url.match(/[_-]Ep(\d+(?:\.\d+)?)[\/\.]/i);
+    // Try to extract episode number from the CDN URL path first.
+    // Handles both old format (-Ep3/ or _Ep3/) and new format (/Ep3.)
+    const epMatch = url.match(/[_\-\/]Ep(\d+(?:\.\d+)?)[\/\.]/i);
     const epNum = epMatch ? parseFloat(epMatch[1]) : currentEpisodeNumber();
     if (epNum === null) return;
 
