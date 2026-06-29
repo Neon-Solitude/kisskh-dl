@@ -21,6 +21,10 @@
 
 Command-line tool for downloading dramas from [kisskh.nl](https://kisskh.nl/).
 
+> **For developers:** see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the
+> tool is built and [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for setup, tests,
+> and conventions.
+
 ## Contents
 
 - [Installation](#installation)
