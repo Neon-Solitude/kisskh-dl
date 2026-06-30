@@ -473,7 +473,7 @@ def collect(
 
         kisskh collect "https://kisskh.nl/Drama/Customized-Lover-(2026)?id=13191"
 
-        kisskh dl --from-manifest "Customized_Lover__2026__manifest.json" -o "C:\\Users\\onika\\Downloads"
+        kisskh dl --from-manifest "Customized_Lover__2026__manifest.json" -o "C:\\Users\\you\\Downloads"
     """
     logger = logging.getLogger(__name__)
     base_url = _resolve_base_url()
@@ -606,7 +606,7 @@ def collect(
     click.echo(f"  With subtitles     : {with_subs}")
     click.echo("")
     click.echo("Download with:")
-    click.echo(f'  kisskh dl --from-manifest "{output_path}" -o "C:\\Users\\onika\\Downloads"')
+    click.echo(f'  kisskh dl --from-manifest "{output_path}" -o "C:\\Users\\you\\Downloads"')
     click.echo("")
 
 
@@ -730,7 +730,7 @@ def open_browser(port: int, browser_path: str | None) -> None:
     \b
         kisskh open-browser
         kisskh collect "DRAMA_URL" --cdp-url http://localhost:9222
-        kisskh dl --from-manifest manifest.json -o "C:\\Users\\onika\\Downloads"
+        kisskh dl --from-manifest manifest.json -o "C:\\Users\\you\\Downloads"
     """
     import subprocess
     import urllib.request

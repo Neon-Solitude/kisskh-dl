@@ -16,7 +16,7 @@
  *        • click "Copy" to copy the manifest JSON to your clipboard, or
  *        • click "Download" to save it as <drama>_manifest.json (lands in your
  *          browser's Downloads folder — move it into the repo's manifests/ folder)
- *   7. Run: kissget dl --from-manifest manifests/<drama>_manifest.json -o "C:\Users\onika\Downloads"
+ *   7. Run: kissget dl --from-manifest manifests/<drama>_manifest.json -o "C:\Users\you\Downloads"
  *
  * Data is stored in localStorage, so it survives accidental page refreshes.
  * Click "Clear" in the overlay to start over for a different show.
