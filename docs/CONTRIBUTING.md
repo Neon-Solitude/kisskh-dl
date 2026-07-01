@@ -94,12 +94,13 @@ pipeline (`Downloader`, `manifest`, `models`) stays untouched. Two depths:
 
 - **Collector-first (simplest).** When a site authenticates in ways that are hard
   to replicate headlessly (account/Firebase auth, etc.), write a browser collector
-  modelled on [`tools/browser_collector.js`](../tools/browser_collector.js) or
-  [`tools/asiaflix_collector.js`](../tools/asiaflix_collector.js). It captures the
-  resolved stream + subtitle URLs from your logged-in session and exports the
-  standard manifest — `{drama, site, episodes:[{number, stream_url, subtitles}]}`.
-  Since `dl --from-manifest` is site-agnostic, the only Python change is a
-  `site → Referer` entry in [`manifest.py`](../src/kissget/manifest.py).
+  modelled on [`tools/browser_collector.js`](../tools/browser_collector.js). It
+  captures the resolved stream + subtitle URLs from your logged-in session and
+  exports the standard manifest — `{drama, episodes:[{number, stream_url, subtitles}]}`
+  (optionally a top-level `"referer"` if the CDN checks it). `dl --from-manifest`
+  handles the rest with no Python changes. **Caveat:** this only works if the site
+  serves its *own* stream; embed aggregators that iframe third-party players (see
+  the scope note in ARCHITECTURE) can't be collected this way.
 
 - **Full API adapter.** For a headless `collect` / `dl <url>` experience, implement
   [`SiteProvider`](../src/kissget/providers/base.py) in a new

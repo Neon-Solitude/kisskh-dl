@@ -249,8 +249,7 @@ def dl(
         manifest = ManifestReader.from_file(from_manifest)
         drama_name = _sanitize_path_component(manifest.drama_name)
 
-        # A manifest may declare its own Referer (e.g. AsiaFlix CDN needs an
-        # asiaflix Referer rather than the kisskh default).
+        # A manifest may declare its own Referer (some CDNs check it).
         if manifest.referer:
             logger.debug("Using manifest Referer for downloads: %s", manifest.referer)
             downloader.referer = manifest.referer

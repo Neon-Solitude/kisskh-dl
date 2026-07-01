@@ -44,8 +44,8 @@ def test_multiple_matches_with_tty_prompts(monkeypatch):
 # ── End-to-end CLI wiring (manifest path + provider dispatch) ──────────────
 
 
-def test_dl_from_manifest_uses_site_referer(monkeypatch, tmp_path):
-    """The manifest path should download the stream and apply the site's Referer."""
+def test_dl_from_manifest_applies_referer(monkeypatch, tmp_path):
+    """The manifest path should download the stream and apply the manifest's Referer."""
     calls = {}
 
     class FakeDownloader:
@@ -62,11 +62,11 @@ def test_dl_from_manifest_uses_site_referer(monkeypatch, tmp_path):
 
     manifest = {
         "drama": "Test-Show",
-        "site": "asiaflix",
+        "referer": "https://cdn.example/",
         "episodes": [
             {
                 "number": 1,
-                "stream_url": "http://cdn1.asiaflix.net/e1.m3u8",
+                "stream_url": "http://cdn.example/e1.m3u8",
                 "subtitles": [{"lang": "en", "label": "English", "src": "http://x/e1.vtt"}],
             }
         ],
@@ -77,7 +77,7 @@ def test_dl_from_manifest_uses_site_referer(monkeypatch, tmp_path):
     result = CliRunner().invoke(kissget, ["dl", "--from-manifest", str(path), "-o", str(tmp_path), "-s", "en"])
 
     assert result.exit_code == 0, result.output
-    assert calls["video"] == ("http://cdn1.asiaflix.net/e1.m3u8", "https://asiaflix.net/")
+    assert calls["video"] == ("http://cdn.example/e1.m3u8", "https://cdn.example/")
     assert calls["subs"] == ["http://x/e1.vtt"]
 
 

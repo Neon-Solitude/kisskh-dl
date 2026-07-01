@@ -25,15 +25,21 @@ at contributors and maintainers. For end-user instructions, see the
 
 kissget is a Python CLI built on [Click](https://click.palletsprojects.com/). It
 downloads dramas from **kisskh** (`kisskh.nl`/`kisskh.co`), whose stream and
-subtitle APIs require a short-lived `kkey` token, and from **AsiaFlix** via the
-collector/manifest path. The architecture is organised around two ideas:
+subtitle APIs require a short-lived `kkey` token. The architecture is organised
+around two ideas:
 
 1. **Isolate each site behind a provider.** Everything site-specific — URL shape,
    search, auth, stream/subtitle resolution — lives in a `SiteProvider`
    ([`providers/`](../src/kissget/providers/)), so the rest of the pipeline (fetch
-   metadata → resolve stream URL → download) is site-agnostic.
+   metadata → resolve stream URL → download) is site-agnostic and ready for future
+   direct-stream sites.
 2. **Isolate the auth problem.** For kisskh that means the `kkey` token; the
    manifest path sidesteps auth entirely by capturing resolved CDN URLs.
+
+> **Scope note.** kissget targets sites that serve their *own* stream. Embed
+> aggregators like AsiaFlix — which only iframe third-party players (Videasy,
+> vidbasic, …) — are out of scope, since the stream lives in a cross-origin frame
+> the tool can't reach.
 
 ```mermaid
 graph TB
@@ -93,12 +99,12 @@ graph TB
 | [`providers/`](../src/kissget/providers/) | `SiteProvider` interface + registry (`get_provider`). Everything site-specific — URL parsing, search, auth, stream/subtitle resolution — lives behind this. `KisskhProvider` covers `kisskh.nl`/`kisskh.co` (wraps `KissKHApi`); passing a site URL auto-targets that domain. |
 | [`kisskh_api.py`](../src/kissget/kisskh_api.py) | `KissKHApi` — HTTP client for the kisskh REST API. Builds endpoint URLs, sends requests with browser-like headers, parses responses into models, and delegates kkey generation to `KkeyProvider`. Used by `KisskhProvider`. |
 | [`kkey_utils.py`](../src/kissget/kkey_utils.py) | `KkeyProvider` — drives a browser (CDP or Playwright) to load an episode page and intercept `kkey` tokens from outgoing network requests. |
-| [`manifest.py`](../src/kissget/manifest.py) | `ManifestReader` / `ManifestEpisode` — parse a collector-produced JSON manifest into episode objects for the kkey-free path. Site-agnostic; an optional `site`/`referer` sets the download Referer (e.g. AsiaFlix). |
+| [`manifest.py`](../src/kissget/manifest.py) | `ManifestReader` / `ManifestEpisode` — parse a collector-produced JSON manifest into episode objects for the kkey-free path. Site-agnostic; an optional `referer` field sets the download Referer when a CDN requires one. |
 | [`downloader.py`](../src/kissget/downloader.py) | `Downloader` — downloads video (via N_m3u8DL-RE, falling back to yt-dlp) and subtitles, with optional decryption. Auto-detects binaries and detects network/ISP blocks. Site-agnostic. |
 | [`models/`](../src/kissget/models/) | Pydantic models: `Drama`/`Episode`, `Search`/`DramaInfo`, `Sub`/`SubItem`. |
 | [`helper/`](../src/kissget/helper/) | `SubtitleDecrypter` + `AESCipher` for decrypting encrypted `.srt` subtitles. |
 | [`enums/quality.py`](../src/kissget/enums/quality.py) | `Quality` enum (`360p`–`1080p`). |
-| [`tools/browser_collector.js`](../tools/browser_collector.js) · [`asiaflix_collector.js`](../tools/asiaflix_collector.js) | Browser-side DevTools scripts that capture CDN URLs and export a manifest — one per site. The most reliable auth path — see Workflow A. |
+| [`tools/browser_collector.js`](../tools/browser_collector.js) | Browser-side DevTools script that captures CDN URLs and exports a manifest. The most reliable auth path — see Workflow A. |
 
 ---
 
@@ -354,9 +360,8 @@ Secrets resolve in the order **CLI flag → environment variable → default**, 
   pipeline, manifest, and models don't change. `KisskhProvider` wraps the
   existing `KissKHApi`/`KkeyProvider` unchanged.
 - **The manifest format is site-agnostic.** It carries only `stream_url` +
-  subtitle URLs (plus an optional `site`/`referer`), so `dl --from-manifest`
-  works for any site whose collector emits it — which is why AsiaFlix needs no
-  live-API adapter.
+  subtitle URLs (plus an optional `referer`), so `dl --from-manifest` works for
+  any site whose collector emits it.
 - **Auth is isolated by design.** `KkeyProvider` is the only browser-aware
   component; everything downstream operates on plain URLs. The manifest workflow
   exploits this by skipping the provider altogether.

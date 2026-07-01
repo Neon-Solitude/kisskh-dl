@@ -7,7 +7,7 @@ from kissget.providers.kisskh import KisskhProvider as KisskhProviderClass
 def test_matches_kisskh_domains():
     assert KisskhProvider.matches("https://kisskh.nl/Drama/X?id=1")
     assert KisskhProvider.matches("https://kisskh.co/Drama/X?id=1")
-    assert not KisskhProvider.matches("https://asiaflix.net/home")
+    assert not KisskhProvider.matches("https://example.com/show?id=1")
 
 
 def test_parse_url_drama_level():
@@ -35,7 +35,7 @@ def test_parse_url_missing_id_raises():
 def test_get_provider_selects_kisskh_and_defaults():
     assert isinstance(get_provider("https://kisskh.co/Drama/X?id=1"), KisskhProviderClass)
     # Unknown URL and bare-query (no url) both fall back to kisskh.
-    assert isinstance(get_provider("https://asiaflix.net/home"), KisskhProviderClass)
+    assert isinstance(get_provider("https://example.com/show?id=1"), KisskhProviderClass)
     assert isinstance(get_provider(), KisskhProviderClass)
 
 

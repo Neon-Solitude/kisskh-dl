@@ -29,20 +29,6 @@ from kissget.models.sub import SubItem
 
 logger = logging.getLogger(__name__)
 
-# Known collector sites → the Referer the downloader should send for their CDN.
-# A manifest may instead carry an explicit "referer"; that always wins.
-_SITE_REFERERS = {
-    "kisskh": "https://kisskh.nl/",
-    "asiaflix": "https://asiaflix.net/",
-}
-
-
-def _referer_for_site(site: str | None) -> str | None:
-    """Map an optional manifest "site" hint to a Referer, or None if unknown."""
-    if not site:
-        return None
-    return _SITE_REFERERS.get(site.strip().lower())
-
 
 class ManifestEpisode:
     """A single episode entry from the manifest."""
@@ -73,8 +59,8 @@ class ManifestReader:
     ) -> None:
         self.drama_name = drama_name
         self.episodes = episodes
-        # Optional per-site Referer for the downloader (e.g. AsiaFlix CDN needs an
-        # asiaflix Referer). None → caller falls back to the default base URL.
+        # Optional Referer for the downloader when a manifest's CDN needs a
+        # specific one. None → caller falls back to the default base URL.
         self.referer = referer
 
     @classmethod
@@ -88,8 +74,8 @@ class ManifestReader:
             data = json.load(f)
 
         drama_name: str = data.get("drama", "Unknown")
-        # Explicit "referer" wins; otherwise derive from an optional "site" hint.
-        referer: str | None = data.get("referer") or _referer_for_site(data.get("site"))
+        # Optional explicit Referer for the downloader (e.g. a CDN that checks it).
+        referer: str | None = data.get("referer")
         episodes: list[ManifestEpisode] = []
 
         for ep_data in data.get("episodes", []):
