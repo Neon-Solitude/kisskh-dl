@@ -1,25 +1,30 @@
 # kissget
 
 <div align="center">
-   <strong><i>CLI downloader for https://kisskh.nl/ with kkey-free manifest workflow</i></strong>
+   <strong><i>CLI downloader for kisskh (.nl / .co) and AsiaFlix — kkey-free manifest workflow</i></strong>
    <br><br>
 
    ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
-   ![License](https://img.shields.io/github/license/Neon-Solitude/kisskh-dl?style=for-the-badge)
+   ![License](https://img.shields.io/github/license/Neon-Solitude/kissget?style=for-the-badge)
    ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-607D8B?style=for-the-badge&logo=windowsterminal&logoColor=white)
    <br>
+   ![Sites](https://img.shields.io/badge/sites-kisskh%20%7C%20AsiaFlix-0EA5E9?style=for-the-badge)
    ![kkey-free](https://img.shields.io/badge/kkeys-NOT%20REQUIRED-brightgreen?style=for-the-badge)
    ![Workflow](https://img.shields.io/badge/workflow-manifest--based-8B5CF6?style=for-the-badge)
    [![Downloader](https://img.shields.io/badge/downloader-N__m3u8DL--RE-F97316?style=for-the-badge)](https://github.com/nilaoda/N_m3u8DL-RE)
    <br>
    ![Fork](https://img.shields.io/badge/fork_of-debakarr%2Fkisskh--dl-6B7280?style=for-the-badge&logo=github&logoColor=white)
-   ![Stars](https://img.shields.io/github/stars/Neon-Solitude/kisskh-dl?style=for-the-badge&logo=github&color=EAB308)
+   ![Stars](https://img.shields.io/github/stars/Neon-Solitude/kissget?style=for-the-badge&logo=github&color=EAB308)
 
 </div>
 
 ---
 
-Command-line tool for downloading dramas from [kisskh.nl](https://kisskh.nl/).
+Command-line tool for downloading dramas from **kisskh** (`kisskh.nl`, `kisskh.co`) and
+**AsiaFlix** (`asiaflix.net` / `asiaflix.in`). Downloads run through one site-agnostic
+pipeline — N_m3u8DL-RE (with a yt-dlp fallback), automatic network/ISP block detection,
+quality selection, and subtitle handling — while each site plugs in behind a small
+provider adapter.
 
 > **For developers:** see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the
 > tool is built and [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for setup, tests,
@@ -32,6 +37,7 @@ Command-line tool for downloading dramas from [kisskh.nl](https://kisskh.nl/).
 - [Method A: Browser Collector Script (Recommended)](#method-a-browser-collector-script-recommended)
 - [Method B: `kissget collect` CLI](#method-b-kissget-collect-cli)
 - [Method C: Direct API Download](#method-c-direct-api-download)
+- [Other sites (kisskh.co, AsiaFlix)](#other-sites)
 - [Command Reference](#command-reference)
 - [Authentication](#authentication)
 - [N_m3u8DL-RE (Faster Downloads)](#n_m3u8dl-re-faster-downloads)
@@ -226,6 +232,50 @@ If the site blocks the headless browser with a CAPTCHA, run in headed mode so yo
 ```console
 kissget dl "https://kisskh.nl/Drama/Show-Name?id=1234" --headed -o .
 ```
+
+---
+
+## Other sites
+
+`kissget` isn't limited to `kisskh.nl`.
+
+### kisskh.co (and other kisskh domains)
+
+`kisskh.co` runs the **same platform** as `kisskh.nl` — identical API. Just pass a
+`kisskh.co` URL; kissget targets whichever kisskh domain the URL uses, so every
+workflow (collector, `collect`, direct API) works unchanged:
+
+```console
+kissget dl "https://kisskh.co/Drama/Show-Name?id=1234" -o .
+```
+
+For a search-by-name (no URL) against a specific domain, set the base URL:
+
+```console
+set KISSKH_BASE_URL=https://kisskh.co
+kissget dl "Some Show" -o .
+```
+
+### AsiaFlix (asiaflix.net / asiaflix.in)
+
+AsiaFlix is a **different platform** (a Firebase-authenticated API), so it uses the
+**collector workflow only**:
+
+1. Log in and open your show on `https://asiaflix.net` (or `.in`).
+2. DevTools (F12) → **Console** → paste the entire contents of
+   [`tools/asiaflix_collector.js`](tools/asiaflix_collector.js) → Enter.
+3. Open each episode and press **Play** until the video starts. (AsiaFlix resolves
+   streams lazily, so — unlike kisskh — you usually need to press Play.) Check the
+   overlay's **Episode #** box is right for the episode you're on.
+4. Click **Copy** or **Download** when every episode shows a stream, then:
+
+```console
+kissget dl --from-manifest asiaflix_manifest.json -o "C:\Users\you\Videos"
+```
+
+The AsiaFlix manifest is tagged `"site": "asiaflix"`, so downloads automatically use
+the correct CDN `Referer`. (A manifest may also carry an explicit `"referer"` field,
+which overrides the site default.)
 
 ---
 

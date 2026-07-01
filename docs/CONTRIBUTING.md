@@ -14,8 +14,8 @@ organised, read [ARCHITECTURE.md](ARCHITECTURE.md) first.
 ## Setup
 
 ```console
-git clone https://github.com/Neon-Solitude/kisskh-dl.git
-cd kisskh-dl
+git clone https://github.com/Neon-Solitude/kissget.git
+cd kissget
 uv sync
 ```
 
@@ -86,6 +86,28 @@ A few project conventions worth matching:
   aborting a batch (see [`cli.py`](../src/kissget/cli.py)).
 - Any user-supplied string used in an output path must pass through
   `_sanitize_path_component()`.
+
+## Adding a site
+
+New-site support plugs in behind the **provider** abstraction; the download
+pipeline (`Downloader`, `manifest`, `models`) stays untouched. Two depths:
+
+- **Collector-first (simplest).** When a site authenticates in ways that are hard
+  to replicate headlessly (account/Firebase auth, etc.), write a browser collector
+  modelled on [`tools/browser_collector.js`](../tools/browser_collector.js) or
+  [`tools/asiaflix_collector.js`](../tools/asiaflix_collector.js). It captures the
+  resolved stream + subtitle URLs from your logged-in session and exports the
+  standard manifest — `{drama, site, episodes:[{number, stream_url, subtitles}]}`.
+  Since `dl --from-manifest` is site-agnostic, the only Python change is a
+  `site → Referer` entry in [`manifest.py`](../src/kissget/manifest.py).
+
+- **Full API adapter.** For a headless `collect` / `dl <url>` experience, implement
+  [`SiteProvider`](../src/kissget/providers/base.py) in a new
+  `src/kissget/providers/<site>.py` and register it in
+  [`providers/__init__.py`](../src/kissget/providers/__init__.py) (implement
+  `matches`, `parse_url`, `search`, `get_episode_ids`, `generate_auth`,
+  `get_stream_url`, `get_subtitles`, `referer`). The CLI resolves the provider by
+  URL host automatically. `KisskhProvider` is the reference implementation.
 
 ## Tests
 
