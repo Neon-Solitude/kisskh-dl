@@ -10,7 +10,7 @@ import click
 import validators
 from dotenv import load_dotenv
 
-from kissget.downloader import Downloader
+from kissget.downloader import Downloader, NetworkBlockError
 from kissget.enums.quality import Quality
 from kissget.helper.decrypt_subtitle import SubtitleDecrypter
 from kissget.kisskh_api import KissKHApi
@@ -276,6 +276,9 @@ def dl(
                 logger.info("Downloading video for Episode %s...", episode_tag)
                 try:
                     downloader.download_video_from_stream_url(ep.stream_url, filepath, quality)
+                except NetworkBlockError as e:
+                    logger.error("%s", e)
+                    return
                 except Exception as e:
                     logger.error("Failed to download video for Episode %s: %s — skipping.", episode_tag, e)
             elif not subs_only and not ep.stream_url:
@@ -383,6 +386,9 @@ def dl(
             logger.debug("Using video url: %s", video_stream_url)
             try:
                 downloader.download_video_from_stream_url(video_stream_url, filepath, quality)
+            except NetworkBlockError as e:
+                logger.error("%s", e)
+                break
             except Exception as e:
                 logger.error("Failed to download video for Episode %s: %s — skipping.", episode_tag, e)
                 continue
@@ -430,6 +436,9 @@ def dl(
             logger.debug("Using video url: %s", video_stream_url)
             try:
                 downloader.download_video_from_stream_url(video_stream_url, filepath, quality)
+            except NetworkBlockError as e:
+                logger.error("%s", e)
+                break
             except Exception as e:
                 logger.error("Failed to download video for Episode %s: %s — skipping.", episode_tag, e)
                 continue

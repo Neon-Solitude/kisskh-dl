@@ -13,6 +13,14 @@ from kissget.models.sub import SubItem
 
 logger = logging.getLogger(__name__)
 
+
+class NetworkBlockError(Exception):
+    """Raised when the video CDN host appears to be blocked or intercepted by the
+    local network/ISP (e.g. a content filter such as CUJO / Spectrum Security
+    Shield). Signals the caller to stop and surface clear guidance instead of
+    letting a download backend spin on TLS errors."""
+
+
 # Quality ladder (heights) derived from the Quality enum, ascending: [360, 480, 540, 720, 1080]
 _QUALITY_HEIGHTS = sorted(int(q.value.rstrip("p")) for q in Quality)
 
@@ -80,6 +88,85 @@ def _video_select_args(quality: str) -> list[str]:
     return ["--select-video", f'res="x({alternation})$":for=best', "--select-audio", "best"]
 
 
+# Hostname/path fragments that mark an ISP/router content-filter block page.
+_BLOCK_PAGE_MARKERS = (
+    "cujo.io",
+    "warn.html",
+    "blockpage",
+    "securityshield",
+    "contentfilter",
+    "fortiguard",
+    "opendns",
+    "/block",
+)
+
+# Per-host detection cache so a multi-episode batch probes each host at most once.
+_block_cache: dict[str, str | None] = {}
+
+_PROBE_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+)
+
+
+def _detect_network_block(url: str) -> str | None:
+    """Best-effort check for a network/ISP-level block of the CDN host.
+
+    Returns a short human-readable reason when a block is detected, else None.
+    Two high-confidence signals, either of which is enough:
+
+      1. an HTTP request to the host is redirected to a known filter/block page;
+      2. the HTTPS handshake fails with the 'wrong version number' family, which
+         means a transparent interceptor is sitting in front of the host.
+
+    Results are cached per host. Anything ambiguous (timeouts, ordinary
+    connection errors) returns None, so a transient hiccup is never mistaken for
+    a block — the download backend is still allowed to try.
+    """
+    host = urlparse(url).hostname or ""
+    if not host or "kisskh" in host:
+        return None
+    if host in _block_cache:
+        return _block_cache[host]
+
+    reason: str | None = None
+    headers = {"User-Agent": _PROBE_UA}
+
+    # Signal 1: HTTP redirected to a filter/block page.
+    try:
+        resp = requests.get(f"http://{host}/", headers=headers, allow_redirects=False, timeout=6)
+        location = resp.headers.get("Location", "")
+        if 300 <= resp.status_code < 400 and any(m in location.lower() for m in _BLOCK_PAGE_MARKERS):
+            redirect_host = urlparse(location).hostname or location
+            reason = f"the network redirected '{host}' to a filter/block page ({redirect_host})"
+    except requests.RequestException:
+        pass
+
+    # Signal 2: HTTPS handshake broken by a transparent interceptor.
+    if reason is None:
+        try:
+            requests.head(f"https://{host}/", headers=headers, timeout=6)
+        except requests.exceptions.SSLError as e:
+            msg = str(e).lower()
+            if "wrong version number" in msg or "unknown protocol" in msg or "sslv3" in msg:
+                reason = f"the TLS connection to '{host}' is being broken (likely a transparent network interceptor)"
+        except requests.RequestException:
+            pass
+
+    _block_cache[host] = reason
+    return reason
+
+
+def _network_block_error(reason: str) -> NetworkBlockError:
+    """Build a NetworkBlockError carrying actionable, user-facing guidance."""
+    return NetworkBlockError(
+        f"Cannot reach the video CDN — {reason}.\n"
+        "This is a network-level block, not a problem with kissget or the file.\n"
+        "Fix: connect a SYSTEM-level VPN (a desktop app, not a browser extension) and retry, or\n"
+        "turn off your ISP/router content filter (e.g. Spectrum Security Shield / CUJO).\n"
+        "See the README 'Troubleshooting' section for details."
+    )
+
+
 class Downloader:
     def __init__(
         self,
@@ -130,8 +217,15 @@ class Downloader:
         :param quality: quality to select (e.g. "1080p")
         """
         if self._n_m3u8dl_re:
+            # N_m3u8DL-RE fails fast on a blocked host; we classify the block in
+            # its non-zero handler (below) to avoid a probe on the happy path.
             self._download_with_n_m3u8dl_re(video_stream_url, filepath, quality)
         else:
+            # No N_m3u8DL-RE: probe up front so a block raises cleanly instead of
+            # letting yt-dlp grind through its retry storm.
+            blocked = _detect_network_block(video_stream_url)
+            if blocked:
+                raise _network_block_error(blocked)
             self._download_with_yt_dlp(video_stream_url, filepath, quality)
 
     def _download_with_n_m3u8dl_re(self, video_stream_url: str, filepath: str, quality: str) -> None:
@@ -186,6 +280,11 @@ class Downloader:
                 timeout=600,  # 10 minute timeout per episode
             )
             if result.returncode != 0:
+                # A non-zero exit on a blocked CDN would just hand yt-dlp the same
+                # doomed host. Classify first and fail fast with guidance instead.
+                blocked = _detect_network_block(video_stream_url)
+                if blocked:
+                    raise _network_block_error(blocked)
                 logger.warning("N_m3u8DL-RE exited with code %d, falling back to yt-dlp", result.returncode)
                 self._download_with_yt_dlp(video_stream_url, filepath, quality)
         except FileNotFoundError:

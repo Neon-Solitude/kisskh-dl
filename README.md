@@ -418,6 +418,8 @@ kissget dl "DRAMA_URL" --decrypt-subtitle -o .
 
 Your ISP may be blocking the CDN domain at the network level. The site streams video through CDN hosts that some ISPs intercept. To fix this, connect to a VPN **at the system level** (desktop app, not a browser extension). A browser extension only routes browser traffic — the downloader runs outside the browser and needs a system-wide VPN.
 
+`kissget` detects this situation automatically: when the CDN host is redirected to an ISP/router filter page (e.g. CUJO / Spectrum Security Shield) or its TLS connection is broken by a transparent interceptor, the download stops immediately with a one-line explanation instead of grinding through hundreds of SSL retries. If you see that message, connect a system-level VPN (or disable the ISP/router content filter) and re-run.
+
 ### SSL errors (`WRONG_VERSION_NUMBER`) on video or subtitle downloads
 
 Some CDN hosts serve HTTP traffic on port 443. The tool handles this automatically by downgrading `https://` to `http://` for non-kisskh CDN hosts.
